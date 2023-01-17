@@ -8,6 +8,26 @@
    type        = string
 }
 
+ variable "nessus_centos" {
+   description = "nessus exe file"
+   type        = string
+}
+
+ variable "nessus_ubuntu" {
+   description = "nessus exe file"
+   type        = string
+}
+
+variable "nessus_debian" {
+   description = "nessus exe file"
+   type        = string
+}
+
+ variable "nessus_windows" {
+   description = "nessus exe file"
+   type        = string
+}
+
  variable "gen_number_linux_presnapshot" {
    description = "Generation number of linux presnapshot available in GCS"
    type        = string
