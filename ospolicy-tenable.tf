@@ -41,7 +41,7 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-centos-test" {
             source {
               gcs {
                 bucket     = var.bucket_name
-                object     = "NessusAgent-8.3.1-es7.x86_64.rpm"
+                object     = var.nessus_centos
                 generation = var.gen_number_nessus_centos
               }
             }
@@ -115,7 +115,7 @@ resource "google_os_config_os_policy_assignment" "tenable_ubuntu" {
             source {
               gcs {
                 bucket     = var.bucket_name
-                object     = "NessusAgent-8.3.1-ubuntu1110_amd64.deb"
+                object     = var.nessus_ubuntu
                 generation = var.gen_number_nessus_ubuntu
               }
             }
@@ -189,7 +189,7 @@ resource "google_os_config_os_policy_assignment" "tenable_debian" {
             source {
               gcs {
                 bucket     = var.bucket_name
-                object     = "NessusAgent-8.3.1-debian6_amd64.deb"
+                object     = var.nessus_debian
                 generation = var.gen_number_nessus_debian
               }
             }
@@ -264,7 +264,7 @@ resource "google_os_config_os_policy_assignment" "tenable_windows" {
             source {
               gcs {
                 bucket     = var.bucket_name
-                object     = "NessusAgent-7.0.1-x64.msi"
+                object     = var.nessus_windows
                 generation = var.gen_number_nessus_windows
               }
             }
