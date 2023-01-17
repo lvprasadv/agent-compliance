@@ -74,7 +74,7 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-centos-test" {
 
   rollout {
     disruption_budget {
-      fixed = 1
+      fixed = 10
     }
     min_wait_duration = "10s"
   }
