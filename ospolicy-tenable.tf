@@ -9,7 +9,7 @@ data "google_project" "project" {
 
 ############ os config policy - tenable ##############
 
-resource "google_os_config_os_policy_assignment" "oc-tenable-centos" {
+resource "google_os_config_os_policy_assignment" "oc-tenable-centos-test" {
 
 
   count = length(data.google_project.project[*].project_id)
@@ -17,7 +17,7 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-centos" {
 
   location = "us-east1-b"
 
-  name = "tenable-centos"
+  name = "tenable-centos-test"
 
   instance_filter {
     all = false
@@ -79,7 +79,7 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-centos" {
     min_wait_duration = "10s"
   }
 }
-
+/*
 resource "google_os_config_os_policy_assignment" "tenable_ubuntu" {
 
 
@@ -303,3 +303,4 @@ resource "google_os_config_os_policy_assignment" "tenable_windows" {
     min_wait_duration = "10s"
   }
 }
+*/
