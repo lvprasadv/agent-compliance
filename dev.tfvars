@@ -1,0 +1,8 @@
+folder_id = "614695899438"
+bucket_name = "ocgdev-lbk-agent"
+gen_number_linux_presnapshot= "1648068165789022"
+gen_number_windows_presnapshot = "1648068165537369"
+gen_number_nessus_centos = "1634737353755848"
+gen_number_nessus_ubuntu = "1634737424619586"
+gen_number_nessus_debian = "1634737202906033"
+gen_number_nessus_windows = "1634737710723637"
