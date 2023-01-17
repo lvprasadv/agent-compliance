@@ -1,11 +1,11 @@
 ########### data block to fetch projects under specific folder id ###########
-data "google_projects" "folder-projects" {
+/*data "google_projects" "folder-projects" {
   filter = "parent.id:${var.folder_id} lifecycleState:ACTIVE"
 }
 data "google_project" "project" {
     count = length(data.google_projects.folder-projects.projects)
     project_id = data.google_projects.folder-projects.projects[count.index].project_id
-}
+}*/
 
 ############ os config policy - tenable ##############
 
@@ -17,7 +17,7 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-centos-test" {
 
   location = "us-east1-b"
 
-  name = "tenable-centos-test"
+  name = "test"
 
   instance_filter {
     all = false
@@ -63,7 +63,7 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-centos-test" {
           enforce {
             interpreter = "SHELL"
             file {
-              local_path = "./files/tenable_linux_script.sh"
+              local_path = "./files/test.sh"
 
             }
           }
