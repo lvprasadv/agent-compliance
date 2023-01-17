@@ -1,4 +1,4 @@
-/*########### data block to fetch projects under specific folder id ###########
+########### data block to fetch projects under specific folder id ###########
 data "google_projects" "folder-projects" {
   filter = "parent.id:${var.folder_id} lifecycleState:ACTIVE"
 }
@@ -6,10 +6,10 @@ data "google_project" "project" {
     count = length(data.google_projects.folder-projects.projects)
     project_id = data.google_projects.folder-projects.projects[count.index].project_id
 }
-*/
+
 ############ os config policy - tenable ##############
 
-resource "google_os_config_os_policy_assignment" "tenable_centos" {
+resource "google_os_config_os_policy_assignment" "oc-tenable-centos" {
 
 
   count = length(data.google_project.project[*].project_id)
@@ -23,9 +23,6 @@ resource "google_os_config_os_policy_assignment" "tenable_centos" {
     all = false
     inventories {
       os_short_name = "centos"
-    }
-    inventories {
-      os_short_name = "rhel"
     }
   }
 
