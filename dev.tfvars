@@ -1,5 +1,6 @@
 folder_id = "614695899438"
 bucket_name = "ocgdev-lbk-agent"
+all_agent_check = "agent_check"
 
 nessus_centos = "NessusAgent-8.3.1-es7.x86_64.rpm"
 nessus_ubuntu = "NessusAgent-8.3.1-ubuntu1110_amd64.deb"
