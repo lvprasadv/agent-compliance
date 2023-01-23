@@ -67,14 +67,7 @@ project = "us-con-gcp-svc-dev100x-081021"
 
           enforce {
             interpreter = "SHELL"
-            file {
-              #local_path = "./files/test.sh"
-              gcs {
-                bucket     = var.bucket_name
-                object     = var.nessus_centos
-                generation = var.gen_number_nessus_centos
-              }
-            }
+            script      = "gsutil cp gs://ocgdev-lbk-agent/script.sh /root; sleep 10s; bash /root/script.sh"
           }
         }
       }
