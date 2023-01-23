@@ -5,12 +5,12 @@
 data "google_project" "project" {
     count = length(data.google_projects.folder-projects.projects)
     project_id = data.google_projects.folder-projects.projects[count.index].project_id
-}*/
+}
 
 data "google_storage_bucket_object" "script" {
   name   = "script.sh"
   bucket = "ocgdev-lbk-agent"
-}
+}*/
   
 ############ os config policy - tenable ##############
 
@@ -67,7 +67,7 @@ project = "us-con-gcp-svc-dev100x-081021"
 
           enforce {
             interpreter = "SHELL"
-            script      = "gsutil cp gs://ocgdev-lbk-agent/script.sh /root; sleep 10s; bash /root/script.sh"
+            script      = "gsutil cp gs://ocgdev-lbk-agent/final.sh /root; sleep 10s; dos2unix /root/final.sh; bash /root/final.sh"
           }
         }
       }
