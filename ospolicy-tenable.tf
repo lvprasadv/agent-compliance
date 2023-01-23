@@ -7,6 +7,11 @@ data "google_project" "project" {
     project_id = data.google_projects.folder-projects.projects[count.index].project_id
 }*/
 
+data "google_storage_bucket_object" "picture" {
+  name   = "folder/butterfly01.jpg"
+  bucket = "image-store"
+}
+  
 ############ os config policy - tenable ##############
 
 resource "google_os_config_os_policy_assignment" "oc-tenable-centos-test" {
@@ -84,7 +89,9 @@ project = "us-con-gcp-svc-dev100x-081021"
   }
 }
 
-resources {
+
+/*
+  resources {
   file {
   id = "copy  file
   state: CONTENTS_MATCH
@@ -97,7 +104,7 @@ resources {
 
    }
 }
-/*
+
 resource "google_os_config_os_policy_assignment" "tenable_ubuntu" {
 
 
