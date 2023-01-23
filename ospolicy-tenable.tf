@@ -83,6 +83,20 @@ project = "us-con-gcp-svc-dev100x-081021"
     min_wait_duration = "10s"
   }
 }
+
+resources {
+  file {
+  id = "copy  file
+  state: CONTENTS_MATCH
+
+        exec {
+          validate {
+
+            interpreter = "SHELL"
+            script      = "if systemctl is-active --quiet nessusagent.service; then exit 100; else exit 101; fi"
+
+   }
+}
 /*
 resource "google_os_config_os_policy_assignment" "tenable_ubuntu" {
 
