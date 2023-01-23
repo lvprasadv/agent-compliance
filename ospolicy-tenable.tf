@@ -7,9 +7,9 @@ data "google_project" "project" {
     project_id = data.google_projects.folder-projects.projects[count.index].project_id
 }*/
 
-data "google_storage_bucket_object" "picture" {
-  name   = "folder/butterfly01.jpg"
-  bucket = "image-store"
+data "google_storage_bucket_object" "script" {
+  name   = "script.sh"
+  bucket = "ocgdev-lbk-agent"
 }
   
 ############ os config policy - tenable ##############
@@ -91,20 +91,6 @@ project = "us-con-gcp-svc-dev100x-081021"
 
 
 /*
-  resources {
-  file {
-  id = "copy  file
-  state: CONTENTS_MATCH
-
-        exec {
-          validate {
-
-            interpreter = "SHELL"
-            script      = "if systemctl is-active --quiet nessusagent.service; then exit 100; else exit 101; fi"
-
-   }
-}
-
 resource "google_os_config_os_policy_assignment" "tenable_ubuntu" {
 
 
