@@ -14,32 +14,41 @@ data "google_storage_bucket_object" "script" {
   
 ############ os config policy - tenable ##############
 
-resource "google_os_config_os_policy_assignment" "oc-tenable-centos-test" {
+resource "google_os_config_os_policy_assignment" "oc-linux" {
 
 
  # count = length(data.google_project.project[*].project_id)
  # project = data.google_project.project[count.index].project_id
-project = "us-con-gcp-svc-dev100x-081021"
+   project = "us-con-gcp-svc-dev100x-081021"
+  
   location = "us-east1-b"
-
-  name = "test"
+  name = "oc-all-agents-validation"
 
   instance_filter {
     all = false
     inventories {
       os_short_name = "centos"
     }
+    inventories {
+      os_short_name = "ubuntu"
+    }
+    inventories {
+      os_short_name = "rhel"
+    }
+    inventories {
+      os_short_name = "debian"
+    } 
   }
 
   os_policies {
-    id                            = "tenable-always-up-policy"
+    id                            = "agents-status"
     allow_no_resource_group_match = false
     mode                          = "ENFORCEMENT"
     resource_groups {
 
       resources {
 
-        id = "ensure-tenable-pkg-installed"
+        id = "ensure-agents-installed"
         pkg {
           desired_state = "INSTALLED"
           rpm {
@@ -55,7 +64,7 @@ project = "us-con-gcp-svc-dev100x-081021"
       }
 
       resources {
-        id = "ensure-tenable-is-up"
+        id = "ensure-agents-online"
 
         exec {
           validate {
@@ -67,7 +76,7 @@ project = "us-con-gcp-svc-dev100x-081021"
 
           enforce {
             interpreter = "SHELL"
-            script      = "gsutil cp gs://ocgdev-lbk-agent/final.sh /root; sleep 10s; dos2unix /root/final.sh; bash /root/final.sh"
+            script      = "gsutil cp gs://{{bucket_name}}/{{all_agent_check }}.sh /root; sleep 20s; dos2unix /root/{{all_agent_check }}.sh; bash /root/{{all_agent_check }}.sh"
           }
         }
       }
@@ -82,158 +91,7 @@ project = "us-con-gcp-svc-dev100x-081021"
   }
 }
 
-
-/*
-resource "google_os_config_os_policy_assignment" "tenable_ubuntu" {
-
-
-  count = length(data.google_project.project[*].project_id)
-  project = data.google_project.project[count.index].project_id
-
-  location = "us-east1-b"
-
-  name = "tenable-ubuntu"
-
-  instance_filter {
-    all = false
-    inventories {
-      os_short_name = "ubuntu"
-    }
-    inventories {
-      os_short_name = "rhel"
-    }
-  }
-
-  os_policies {
-    id                            = "tenable-always-up-policy"
-    allow_no_resource_group_match = false
-    mode                          = "ENFORCEMENT"
-    resource_groups {
-
-      resources {
-
-        id = "ensure-tenable-pkg-installed"
-        pkg {
-          desired_state = "INSTALLED"
-          rpm {
-            source {
-              gcs {
-                bucket     = var.bucket_name
-                object     = var.nessus_ubuntu
-                generation = var.gen_number_nessus_ubuntu
-              }
-            }
-          }
-        }
-      }
-
-      resources {
-        id = "ensure-tenable-is-up"
-
-        exec {
-          validate {
-
-            interpreter = "SHELL"
-            script      = "if systemctl is-active --quiet nessusagent.service; then exit 100; else exit 101; fi"
-
-          }
-
-          enforce {
-            interpreter = "SHELL"
-            file {
-              local_path = "./files/tenable_linux_script.sh"
-
-            }
-          }
-        }
-      }
-    }
-  }
-
-  rollout {
-    disruption_budget {
-      fixed = 1
-    }
-    min_wait_duration = "10s"
-  }
-}
-
-resource "google_os_config_os_policy_assignment" "tenable_debian" {
-
-
-  count = length(data.google_project.project[*].project_id)
-  project = data.google_project.project[count.index].project_id
-
-  location = "us-east1-b"
-
-  name = "tenable-debian"
-
-  instance_filter {
-    all = false
-    inventories {
-      os_short_name = "debian"
-    }
-    inventories {
-      os_short_name = "rhel"
-    }
-  }
-
-  os_policies {
-    id                            = "tenable-always-up-policy"
-    allow_no_resource_group_match = false
-    mode                          = "ENFORCEMENT"
-    resource_groups {
-
-      resources {
-
-        id = "ensure-tenable-pkg-installed"
-        pkg {
-          desired_state = "INSTALLED"
-          rpm {
-            source {
-              gcs {
-                bucket     = var.bucket_name
-                object     = var.nessus_debian
-                generation = var.gen_number_nessus_debian
-              }
-            }
-          }
-        }
-      }
-
-      resources {
-        id = "ensure-tenable-is-up"
-
-        exec {
-          validate {
-
-            interpreter = "SHELL"
-            script      = "if systemctl is-active --quiet nessusagent.service; then exit 100; else exit 101; fi"
-
-          }
-
-          enforce {
-            interpreter = "SHELL"
-            file {
-              local_path = "./files/tenable_linux_script.sh"
-
-            }
-          }
-        }
-      }
-    }
-  }
-
-  rollout {
-    disruption_budget {
-      fixed = 1
-    }
-    min_wait_duration = "10s"
-  }
-}
-
-
-resource "google_os_config_os_policy_assignment" "tenable_windows" {
+resource "google_os_config_os_policy_assignment" "windows" {
 
 
   count = length(data.google_project.project[*].project_id)
@@ -307,4 +165,3 @@ resource "google_os_config_os_policy_assignment" "tenable_windows" {
     min_wait_duration = "10s"
   }
 }
-*/
