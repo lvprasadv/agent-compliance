@@ -76,7 +76,7 @@ resource "google_os_config_os_policy_assignment" "oc-linux" {
 
           enforce {
             interpreter = "SHELL"
-            script      = "gsutil cp gs://{{bucket_name}}/{{all_agent_check }}.sh /root; sleep 20s; dos2unix /root/{{all_agent_check }}.sh; bash /root/{{all_agent_check }}.sh"
+            script      = "gsutil cp gs://{{bucket_name}}/{{all_agent_check}}.sh /root; sleep 20s; dos2unix /root/{{all_agent_check}}.sh; bash /root/{{all_agent_check}}.sh"
           }
         }
       }
