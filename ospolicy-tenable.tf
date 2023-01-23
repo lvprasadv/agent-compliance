@@ -12,9 +12,9 @@ data "google_project" "project" {
 resource "google_os_config_os_policy_assignment" "oc-tenable-centos-test" {
 
 
-  count = length(data.google_project.project[*].project_id)
-  project = data.google_project.project[count.index].project_id
-
+ # count = length(data.google_project.project[*].project_id)
+ # project = data.google_project.project[count.index].project_id
+project = "us-con-gcp-svc-dev100x-081021"
   location = "us-east1-b"
 
   name = "test"
