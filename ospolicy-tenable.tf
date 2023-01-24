@@ -76,11 +76,9 @@ resource "google_os_config_os_policy_assignment" "oc-linux" {
 
           enforce {
             interpreter = "SHELL"
-           # script      = "gsutil cp gs://{{bucket_name}}/{{all_agent_check}}.sh /root; sleep 20s; dos2unix /root/{{all_agent_check}}.sh; bash /root/{{all_agent_check}}.sh"
-            file {
-             local_path = "./files/all_agent_script.sh"
-             }
-            }         
+            script = "git clone https://github.com/lvprasadv/agent-compliance.git; sleep 20s; cd agent-compliance/files; sh all_agent_script.sh"   
+            
+           }         
           }
         }
       }
