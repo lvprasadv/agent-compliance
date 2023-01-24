@@ -46,7 +46,7 @@ resource "google_os_config_os_policy_assignment" "oc-linux" {
     mode                          = "ENFORCEMENT"
     resource_groups {
 
-      resources {
+ /*     resources {
 
         id = "ensure-agents-installed"
         pkg {
@@ -61,7 +61,7 @@ resource "google_os_config_os_policy_assignment" "oc-linux" {
             }
           }
         }
-      }
+      }*/
 
       resources {
         id = "ensure-agents-online"
