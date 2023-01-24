@@ -100,6 +100,8 @@ then
 then
         echo "OS is DEBIAN" >>/opt/NessusInstall.log
 	sudo apt-get install jq -y
+	sudo apt-get update
+	sudo apt install wget
 	dpkg -r NessusAgent
 	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("debian10_amd64.deb")) ] | max_by(.created_at) | .id')
         echo "The Agent Package ID for UBUNTU is $AGENTPACKAGEID" >>/opt/NessusInstall.log
