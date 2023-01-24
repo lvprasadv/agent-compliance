@@ -178,8 +178,8 @@ if [ "$(systemctl is-active nessusagent.service)" = "inactive" ];
 if [ "$(systemctl is-active ds_agent.service)" = "inactive" ]; 
  then
   TrendmicroStart
-  elseif [ "$(systemctl is-active ds_agent.service)" = "active" ]
-  then
+  elif [ "$(systemctl is-active ds_agent.service)" = "active" ]
+   then
    echo "Trendmicro agent is already installed and running" >>$tmlog
   else
    echo "TM Agent is missing.. Install TM agent" >>$tmlog
