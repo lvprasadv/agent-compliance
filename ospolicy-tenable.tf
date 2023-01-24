@@ -1,3 +1,4 @@
+#need to add git based on os
 ########### data block to fetch projects under specific folder id ###########
 /*data "google_projects" "folder-projects" {
   filter = "parent.id:${var.folder_id} lifecycleState:ACTIVE"
