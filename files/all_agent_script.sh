@@ -122,22 +122,6 @@ echo -e "Linking the agent to the Portal" >>/opt/NessusInstall.log
         sudo /bin/systemctl status nessusagent.service >>/opt/NessusInstall.log
 }
 
-##### Execution starts for nessus
-if [ "$(systemctl is-active nessusagent.service)" = "inactive" ]; 
-
- then
-   NessusInActive
-  elseif [ "$(systemctl is-active nessusagent.service)" = "active" ]
-  then
-   NessusActive
-  elseif [ "$(systemctl is-active nessusagent.service)" = "unknown" ]
-  then
-   NessusInstallation
- else
-   echo "Nessus Agent is missing"
-   NessusInstallation
- fi   
- 
 
  ########################### TM ###################################
 
@@ -170,6 +154,23 @@ TrendmicroStart()
     fi
     
 }
+
+##### Execution starts for nessus
+if [ "$(systemctl is-active nessusagent.service)" = "inactive" ]; 
+
+ then
+   NessusInActive
+  elseif [ "$(systemctl is-active nessusagent.service)" = "active" ]
+  then
+   NessusActive
+  elseif [ "$(systemctl is-active nessusagent.service)" = "unknown" ]
+  then
+   NessusInstallation
+ else
+   echo "Nessus Agent is missing"
+   NessusInstallation
+ fi   
+ 
 
 ##### Execution starts for tm
 if [ "$(systemctl is-active ds_agent.service)" = "inactive" ]; 
