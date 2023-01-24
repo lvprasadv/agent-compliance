@@ -88,8 +88,8 @@ then
  elif [ "$OSNAME" = "$OSUBUN" ]
 then
         echo "OS is UBUNTU" >>/opt/NessusInstall.log
-	sudo apt-get install jq -y
 	sudo apt-get update
+	sudo apt-get install jq -y
 	sudo apt install wget
 	dpkg -r NessusAgent
 	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("ubuntu1110_amd64.deb")) ] | max_by(.created_at) | .id')
@@ -101,8 +101,8 @@ then
  elif [ "$OSNAME" = "$OSDEB" ]
 then
         echo "OS is DEBIAN" >>/opt/NessusInstall.log
-	sudo apt-get install jq -y
 	sudo apt-get update
+	sudo apt-get install jq -y
 	sudo apt install wget
 	dpkg -r NessusAgent
 	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("debian10_amd64.deb")) ] | max_by(.created_at) | .id')
