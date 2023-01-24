@@ -32,15 +32,15 @@ NessusActive()
 NessusLink()
 {
             /opt/nessus_agent/sbin/nessuscli agent status | grep error
-  	        agentLinkStatus=$(echo $?)
+  	    agentLinkStatus=$(echo $?)
             /opt/nessus_agent/sbin/nessuscli agent status | grep warn
             agentLinkStatusWarn=$(echo $?)
             /opt/nessus_agent/sbin/nessuscli agent status | grep "Not linked"
-  	        agentLinkno=$(echo $?)            
+  	    agentLinkno=$(echo $?)            
             if [ $agentLinkStatusWarn -eq "0" ] || [ $agentLinkStatus -eq "0" ] || [ $agentLinkno -eq "0" ]
              then
               echo "Nessus Agent is not linked properly. Linking the agent"
-	          #/opt/nessus_agent/sbin/nessuscli agent unlink --host=cloud.tenable.com --port=443 --key=$nessuskey --groups="'$NessusGroup'"
+	      #/opt/nessus_agent/sbin/nessuscli agent unlink --host=cloud.tenable.com --port=443 --key=$nessuskey --groups="'$NessusGroup'"
               /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups="'$NessusGroup'"
               exit 1
              else
@@ -99,8 +99,9 @@ then
  elif [ "$OSNAME" = "$OSDEB" ]
 then
         echo "OS is DEBIAN" >>/opt/NessusInstall.log
+	sudo apt-get install jq -y
 	dpkg -r NessusAgent
-	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("ubuntu1110_amd64.deb")) ] | max_by(.created_at) | .id')
+	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("debian10_amd64.deb")) ] | max_by(.created_at) | .id')
         echo "The Agent Package ID for UBUNTU is $AGENTPACKAGEID" >>/opt/NessusInstall.log
         wget "https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/$AGENTPACKAGEID/download?i_agree_to_tenable_license_agreement=true" -O /home/packages/nessus.deb
         sudo dpkg -i /home/packages/nessus.deb >>/opt/NessusInstall.log
