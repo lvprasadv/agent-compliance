@@ -1,10 +1,5 @@
-
-
-
-### Variables
-
+#!/bin/bash
 ErrorCount=0
-#bucketname="ocgsh-csv-lbk-admin"ocgdev-lbk-agent
 bucketname="ocgdev-lbk-agent"
 nessuskey="a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16"
 NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google')
@@ -82,25 +77,33 @@ OSCENT='"CentOS Linux"'
 if [ "$OSNAME" = "$OSRHEL" ] || [ "$OSNAME" = "$OSCENT" ]
 then
         echo "OS is RedHat or CentOS" >>/opt/NessusInstall.log
-		sudo rpm -e NessusAgent*
-		gsutil cp gs://$bucketname/NessusAgent-8.3.1-es7.x86_64.rpm /home/packages
-		sudo rpm -ivh /home/packages/Nessus*.rpm >>/opt/NessusInstall.log
+	sudo yum install jq -y
+	sudo rpm -e NessusAgent
+	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("es7.x86_64.rpm")) ] | max_by(.created_at) | .id')
+        echo "The Agent Package ID for RHEL/CENTOS is $AGENTPACKAGEID" >>/opt/NessusInstall.log
+        wget "https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/$AGENTPACKAGEID/download?i_agree_to_tenable_license_agreement=true" -O /home/packages/nessus.rpm
+        sudo rpm -ivh /home/packages/nessus.rpm >>/opt/NessusInstall.log
         echo "**************Nessus agent is installed successfully ***************************"
 
  elif [ "$OSNAME" = "$OSUBUN" ]
 then
         echo "OS is UBUNTU" >>/opt/NessusInstall.log
-		dpkg -r NessusAgent*
-		gsutil cp gs://$bucketname/NessusAgent-8.3.1-ubuntu1110_amd64.deb /home/packages
-		sudo dpkg -i /home/packages/Nessus*.rpm >>/opt/NessusInstall.log
+	sudo apt-get install jq -y
+	dpkg -r NessusAgent
+	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("ubuntu1110_amd64.deb")) ] | max_by(.created_at) | .id')
+        echo "The Agent Package ID for UBUNTU is $AGENTPACKAGEID" >>/opt/NessusInstall.log
+        wget "https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/$AGENTPACKAGEID/download?i_agree_to_tenable_license_agreement=true" -O /home/packages/nessus.deb
+        sudo dpkg -i /home/packages/nessus.deb >>/opt/NessusInstall.log
         echo "**************Nessus agent is installed successfully ***************************"
 
  elif [ "$OSNAME" = "$OSDEB" ]
 then
         echo "OS is DEBIAN" >>/opt/NessusInstall.log
-		dpkg -r NessusAgent*
-		gsutil cp gs://$bucketname/NessusAgent-8.3.1-debian6_amd64.deb /home/packages
-		sudo dpkg -i /home/packages/Nessus*.rpm >>/opt/NessusInstall.log
+	dpkg -r NessusAgent
+	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("ubuntu1110_amd64.deb")) ] | max_by(.created_at) | .id')
+        echo "The Agent Package ID for UBUNTU is $AGENTPACKAGEID" >>/opt/NessusInstall.log
+        wget "https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/$AGENTPACKAGEID/download?i_agree_to_tenable_license_agreement=true" -O /home/packages/nessus.deb
+        sudo dpkg -i /home/packages/nessus.deb >>/opt/NessusInstall.log
         echo "**************Nessus agent is installed successfully ***************************"
 
 else
@@ -110,8 +113,6 @@ echo -e "Linking the agent to the Portal" >>/opt/NessusInstall.log
         /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups="'$NessusGroup'" >>/opt/NessusInstall.log
         sudo /bin/systemctl start nessusagent.service >>/opt/NessusInstall.log
         sudo /bin/systemctl status nessusagent.service >>/opt/NessusInstall.log
-
-
 }
 
 ##### Execution starts for nessus
