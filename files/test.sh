@@ -77,6 +77,8 @@ OSCENT='"CentOS Linux"'
 if [ "$OSNAME" = "$OSRHEL" ] || [ "$OSNAME" = "$OSCENT" ]
 then
         echo "OS is RedHat or CentOS" >>/opt/NessusInstall.log
+	sudo yum install epel-release -y
+	sudo yum update -y
 	sudo yum install jq -y
 	sudo rpm -e NessusAgent
 	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("es7.x86_64.rpm")) ] | max_by(.created_at) | .id')
