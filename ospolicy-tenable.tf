@@ -76,7 +76,11 @@ resource "google_os_config_os_policy_assignment" "oc-linux" {
 
           enforce {
             interpreter = "SHELL"
-            script      = "gsutil cp gs://{{bucket_name}}/{{all_agent_check}}.sh /root; sleep 20s; dos2unix /root/{{all_agent_check}}.sh; bash /root/{{all_agent_check}}.sh"
+           # script      = "gsutil cp gs://{{bucket_name}}/{{all_agent_check}}.sh /root; sleep 20s; dos2unix /root/{{all_agent_check}}.sh; bash /root/{{all_agent_check}}.sh"
+            file {
+             local_path = "./files/.sh"
+             }
+            }         
           }
         }
       }
@@ -91,7 +95,7 @@ resource "google_os_config_os_policy_assignment" "oc-linux" {
   }
 }
 
-resource "google_os_config_os_policy_assignment" "windows" {
+/*resource "google_os_config_os_policy_assignment" "windows" {
 
 
   count = length(data.google_project.project[*].project_id)
@@ -165,3 +169,4 @@ resource "google_os_config_os_policy_assignment" "windows" {
     min_wait_duration = "10s"
   }
 }
+*/
