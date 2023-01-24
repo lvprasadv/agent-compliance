@@ -1,9 +1,11 @@
 #!/bin/bash
+
 ErrorCount=0
 bucketname="ocgdev-lbk-agent"
 nessuskey="a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16"
 NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google')
-
+nessuslog="/opt/NessusInstall.log"
+tmlog="/opt/TMInstall.log"
 
 ls -ld /home/packages #Check if packages directory already exists
 
@@ -22,7 +24,7 @@ NessusActive()
     service nessusagent status | grep "active (running)"
     if [ $? -eq 0 ]
 	 then
-  	    echo "Nessus Agent is Installed, State is running - Link Status Check Required "
+  	    echo "Nessus Agent is Installed, State is running - Link Status Check Required " >>$nessuslog
         NessusLink
   	    exit 1
      else
@@ -39,12 +41,12 @@ NessusLink()
   	    agentLinkno=$(echo $?)            
             if [ $agentLinkStatusWarn -eq "0" ] || [ $agentLinkStatus -eq "0" ] || [ $agentLinkno -eq "0" ]
              then
-              echo "Nessus Agent is not linked properly. Linking the agent"
+              echo "Nessus Agent is not linked properly. Linking the agent" >>$nessuslog
 	      #/opt/nessus_agent/sbin/nessuscli agent unlink --host=cloud.tenable.com --port=443 --key=$nessuskey --groups="'$NessusGroup'"
               /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups="'$NessusGroup'"
               exit 1
              else
-              echo "Nessus Agent is Linked properly."
+              echo "Nessus Agent is Linked properly." >>$nessuslog
               exit 0
             fi 
 }
@@ -59,7 +61,7 @@ NessusInActive()
        echo "Nessus Agent is Running, Linking the agent"
        NessusLink
      else
-  	   echo "Nessus Agent is not getting started due to errors, so re-installing."
+  	   echo "Nessus Agent is not getting started due to errors, so re-installing.">>$nessuslog
 	   NessusInstallation
     fi
 
@@ -76,50 +78,50 @@ OSCENT='"CentOS Linux"'
 
 if [ "$OSNAME" = "$OSRHEL" ] || [ "$OSNAME" = "$OSCENT" ]
 then
-        echo "OS is RedHat or CentOS" >>/opt/NessusInstall.log
+        echo "OS is RedHat or CentOS" >>$nessuslog
 	sudo yum install epel-release -y
 	sudo yum update -y
 	sudo yum install jq -y
 	sudo rpm -e NessusAgent
 	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("es7.x86_64.rpm")) ] | max_by(.created_at) | .id')
-        echo "The Agent Package ID for RHEL/CENTOS is $AGENTPACKAGEID" >>/opt/NessusInstall.log
+        echo "The Agent Package ID for RHEL/CENTOS is $AGENTPACKAGEID" >>$nessuslog
         wget "https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/$AGENTPACKAGEID/download?i_agree_to_tenable_license_agreement=true" -O /home/packages/nessus.rpm
-        sudo rpm -ivh /home/packages/nessus.rpm >>/opt/NessusInstall.log
-        echo "**************Nessus agent is installed successfully ***************************"
+        sudo rpm -ivh /home/packages/nessus.rpm >>$nessuslog
+        echo "**************Nessus agent is installed successfully ***************************" >>$nessuslog
 
  elif [ "$OSNAME" = "$OSUBUN" ]
 then
-        echo "OS is UBUNTU" >>/opt/NessusInstall.log
+        echo "OS is UBUNTU" >>$nessuslog
 	sudo apt-get update
 	sudo apt-get install jq -y
 	sudo apt install wget
 	dpkg -r NessusAgent
 	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("ubuntu1110_amd64.deb")) ] | max_by(.created_at) | .id')
-        echo "The Agent Package ID for UBUNTU is $AGENTPACKAGEID" >>/opt/NessusInstall.log
+        echo "The Agent Package ID for UBUNTU is $AGENTPACKAGEID" >>$nessuslog
         wget "https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/$AGENTPACKAGEID/download?i_agree_to_tenable_license_agreement=true" -O /home/packages/nessus.deb
-        sudo dpkg -i /home/packages/nessus.deb >>/opt/NessusInstall.log
-        echo "**************Nessus agent is installed successfully ***************************"
+        sudo dpkg -i /home/packages/nessus.deb >>$nessuslog
+        echo "**************Nessus agent is installed successfully ***************************" >>$nessuslog
 
  elif [ "$OSNAME" = "$OSDEB" ]
 then
-        echo "OS is DEBIAN" >>/opt/NessusInstall.log
+        echo "OS is DEBIAN" >>$nessuslog
 	sudo apt-get update
 	sudo apt-get install jq -y
 	sudo apt install wget
 	dpkg -r NessusAgent
 	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("debian10_amd64.deb")) ] | max_by(.created_at) | .id')
-        echo "The Agent Package ID for UBUNTU is $AGENTPACKAGEID" >>/opt/NessusInstall.log
+        echo "The Agent Package ID for UBUNTU is $AGENTPACKAGEID" >>$nessuslog
         wget "https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/$AGENTPACKAGEID/download?i_agree_to_tenable_license_agreement=true" -O /home/packages/nessus.deb
-        sudo dpkg -i /home/packages/nessus.deb >>/opt/NessusInstall.log
-        echo "**************Nessus agent is installed successfully ***************************"
+        sudo dpkg -i /home/packages/nessus.deb >>$nessuslog
+        echo "**************Nessus agent is installed successfully ***************************" >>$nessuslog
 
 else
-        echo "UNSUPPORTED OS. Skipping Nessus Installation.." >/opt/NessusInstall.log
+        echo "UNSUPPORTED OS. Skipping Nessus Installation.." >$nessuslog
 fi
-echo -e "Linking the agent to the Portal" >>/opt/NessusInstall.log
-        /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups="'$NessusGroup'" >>/opt/NessusInstall.log
-        sudo /bin/systemctl start nessusagent.service >>/opt/NessusInstall.log
-        sudo /bin/systemctl status nessusagent.service >>/opt/NessusInstall.log
+echo -e "Linking the agent to the Portal" >>$nessuslog
+        /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups="'$NessusGroup'" >>$nessuslog
+        sudo /bin/systemctl start nessusagent.service >>$nessuslog
+        sudo /bin/systemctl status nessusagent.service >>$nessuslog
 }
 
 
@@ -136,20 +138,20 @@ echo -e "Linking the agent to the Portal" >>/opt/NessusInstall.log
 	        trendLinuxPolicyID="null"
     fi
 
-      /usr/bin/google-cloud-sdk/bin/gsutil cp gs://$bucketname/AgentDeploymentScript.sh /home/packages >>/opt/TMInstall.log
+      /usr/bin/google-cloud-sdk/bin/gsutil cp gs://$bucketname/AgentDeploymentScript.sh /home/packages >>$tmlog
       sleep 5s
-      sudo bash /home/packages/AgentDeploymentScript.sh $trend_policy_id >>/opt/TMInstall.log
+      sudo bash /home/packages/AgentDeploymentScript.sh $trend_policy_id >>$tmlog
 }
 
 TrendmicroStart()
 {
-    systemctl start ds_agent.service >>/opt/TMInstall.log
+    systemctl start ds_agent.service >>$tmlog
     systemctl is-active ds_agent.service | grep -i "active" | | grep -v 'inactive'   # This will fetch only active and remove line containing inactive output 
     if [ $? -eq 0 ]
 	   then
-       echo "Trendmicro agent is started and running" >>/opt/TMInstall.log
+       echo "Trendmicro agent is started and running" >>$tmlog
      else
-  	   echo "Trendmicro agent is inactive so installing again" >>/opt/TMInstall.log
+  	   echo "Trendmicro agent is inactive so installing again" >>$tmlog
 	     TrendmicroInstall
     fi
     
@@ -167,7 +169,7 @@ if [ "$(systemctl is-active nessusagent.service)" = "inactive" ];
   then
    NessusInstallation
  else
-   echo "Nessus Agent is missing"
+   echo "Nessus Agent is missing" >>$nessuslog
    NessusInstallation
  fi   
  
@@ -178,8 +180,8 @@ if [ "$(systemctl is-active ds_agent.service)" = "inactive" ];
   TrendmicroStart
   elseif [ "$(systemctl is-active ds_agent.service)" = "active" ]
   then
-   echo "Trendmicro agent is already installed and running" >>/opt/TMInstall.log
+   echo "Trendmicro agent is already installed and running" >>$tmlog
   else
-   echo "TM Agent is missing.. Install TM agent" >>/opt/TMInstall.log
+   echo "TM Agent is missing.. Install TM agent" >>$tmlog
    TrendmicroInstall
  fi
