@@ -19,6 +19,7 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-test" {
   
   location = "us-east1-b"
   name = "oc-tenable-test"
+  description = "os policy assignment"
 
   instance_filter {
     all = false
