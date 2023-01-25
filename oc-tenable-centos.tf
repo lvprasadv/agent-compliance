@@ -8,7 +8,7 @@ data "google_project" "project" {
 }
 }*/
   
-############ os config policy - tenable ##############
+############ os config tenable policy - centos/rhel ##############
 
 resource "google_os_config_os_policy_assignment" "oc-tenable" {
 
@@ -37,23 +37,36 @@ resource "google_os_config_os_policy_assignment" "oc-tenable" {
     resource_groups {
 
       resources {
-        id = "ensure-agents-online"
-
+        id = "create-packages-dir"
         exec {
           validate {
-
             interpreter = "SHELL"
-            script      = "if systemctl is-active --quiet nessusagent.service; then exit 100; else exit 101; fi"
-
+            script      = "if [ -d "/home/packages" ]; then exit 100; else exit 101; fi"
           }
 
           enforce {
             interpreter = "SHELL"
-            script      = "gsutil cp gs://{{bucket_name}}/{{all_agent_check}}.sh /root; sleep 20s; dos2unix /root/{{all_agent_check}}.sh; bash /root/{{all_agent_check}}.sh"
+            script      = "echo "Creating packages directory for agents."; sudo mkdir /home/packages; exit 100 "
             }         
           }
-        }
-      }
+       }
+      
+      resources {
+        id = "ensure-nessus-running"
+        exec {
+          validate {
+            interpreter = "SHELL"
+            script      = "if [[ $(systemctl is-active nessusagent.service) == 'active' ]]; then echo "Nessus Agent is Installed, State is active - Link Status Check Required"; exit 100; else exit 101; fi"
+          }
+
+          enforce {
+            interpreter = "SHELL"
+            script      = "echo "Starting Nessus Agent service."; sudo systemctl start nessusagent.service; exit 100 "
+            }         
+          }
+       }
+     
+     }
     }
 
   rollout {
@@ -61,5 +74,5 @@ resource "google_os_config_os_policy_assignment" "oc-tenable" {
       fixed = 10
     }
     min_wait_duration = "10s"
-  }
+   }
 }
