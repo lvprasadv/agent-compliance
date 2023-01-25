@@ -127,3 +127,4 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-test" {
 
 #pass nessuskey
 #pass packageid
+#excludelabels
