@@ -8,7 +8,7 @@ data "google_project" "project" {
 }
 }*/
   
-############ os config tenable policy - centos/rhel ##############
+############ os config tenable policy - ubuntu ##############
 
 resource "google_os_config_os_policy_assignment" "oc-tenable-test" {
 
@@ -24,10 +24,7 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-test" {
   instance_filter {
     all = false
     inventories {
-      os_short_name = "centos"
-    }
-    inventories {
-      os_short_name = "rhel"
+      os_short_name = "ubuntu"
     }
   }
 
