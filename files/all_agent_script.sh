@@ -86,7 +86,9 @@ then
 	AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains("es7.x86_64.rpm")) ] | max_by(.created_at) | .id')
         echo "The Agent Package ID for RHEL/CENTOS is $AGENTPACKAGEID" >>$nessuslog
         wget "https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/$AGENTPACKAGEID/download?i_agree_to_tenable_license_agreement=true" -O /home/packages/nessus.rpm
-        sudo rpm -ivh /home/packages/nessus.rpm >>$nessuslog
+        #instead of wget we can use curl using below command
+	#curl -s -L "https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/$AGENTPACKAGEID/download?i_agree_to_tenable_license_agreement=true" --output /home/packages/nessus.rpm
+	sudo rpm -ivh /home/packages/nessus.rpm >>$nessuslog
         echo "**************Nessus agent is installed successfully ***************************" >>$nessuslog
 
  elif [ "$OSNAME" = "$OSUBUN" ]
