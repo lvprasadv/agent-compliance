@@ -31,7 +31,7 @@ resource "google_os_config_os_policy_assignment" "oc-tenable" {
   }
 
   os_policies {
-    id                            = "nessus_agent_policy"
+    id                            = "nessus-agent-policy"
     allow_no_resource_group_match = false
     mode                          = "ENFORCEMENT"
     resource_groups {
@@ -41,12 +41,12 @@ resource "google_os_config_os_policy_assignment" "oc-tenable" {
         exec {
           validate {
             interpreter = "SHELL"
-            script      = "if [ -d "/home/packages" ]; then exit 100; else exit 101; fi"
+            script      = "if [ -d /home/packages ]; then exit 100; else exit 101; fi"
           }
 
           enforce {
             interpreter = "SHELL"
-            script      = "echo "Creating packages directory for agents."; sudo mkdir /home/packages; exit 100 "
+            script      = "echo 'Creating packages directory for agents.'; sudo mkdir /home/packages; exit 100 "
             }         
           }
        }
@@ -56,12 +56,12 @@ resource "google_os_config_os_policy_assignment" "oc-tenable" {
         exec {
           validate {
             interpreter = "SHELL"
-            script      = "if [[ $(systemctl is-active nessusagent.service) == 'active' ]]; then echo "Nessus Agent is Installed, State is active - Link Status Check Required"; exit 100; else exit 101; fi"
+            script      = "if [[ $(systemctl is-active nessusagent.service) == 'active' ]]; then echo 'Nessus Agent is Installed, State is active - Link Status Check Required'; exit 100; else exit 101; fi"
           }
 
           enforce {
             interpreter = "SHELL"
-            script      = "echo "Starting Nessus Agent service."; sudo systemctl start nessusagent.service; exit 100 "
+            script      = "echo 'Starting Nessus Agent service.'; sudo systemctl start nessusagent.service; exit 100 "
             }         
           }
        }
