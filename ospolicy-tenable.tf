@@ -11,7 +11,7 @@ data "google_storage_bucket_object" "script" {
   name   = "script.sh"
   bucket = "ocgdev-lbk-agent"
 }*/
-  
+ /* 
 ############ os config policy - tenable ##############
 
 resource "google_os_config_os_policy_assignment" "oc-linux" {
@@ -92,7 +92,7 @@ resource "google_os_config_os_policy_assignment" "oc-linux" {
     }
     min_wait_duration = "10s"
   }
-}
+}*/
 
 /*resource "google_os_config_os_policy_assignment" "windows" {
 
