@@ -30,10 +30,7 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-ubuntu" {
     }
 
     inventories {
-      os_short_name = "centos"
-    }
-    inventories {
-      os_short_name = "rhel"
+      os_short_name = "ubuntu"
     }
   }
 
@@ -118,7 +115,7 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-ubuntu" {
 
           enforce {
             interpreter = "SHELL"
-            script      = "nessuskey=a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16; NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google'); sudo dpkg -r NessusAgent; echo 'downlaod package and installing'; sudo apt-get install jq -y; #AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains('es7.x86_64.rpm')) ] | max_by(.created_at) | .id'); curl -s -L 'https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/17306/download?i_agree_to_tenable_license_agreement=true' --output /home/packages/nessus.rpm; sleep 10; sudo dpkg -i /home/packages/nessus.deb; /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups=''$NessusGroup''; sudo /bin/systemctl start nessusagent.service; sudo /bin/systemctl status nessusagent.service; exit 100"
+            script      = "nessuskey=a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16; NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google'); sudo dpkg -r NessusAgent; echo 'downlaod package and installing'; sudo apt-get install jq -y; #AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains('ubuntu1110_amd64')) ] | max_by(.created_at) | .id'); curl -s -L 'https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/17306/download?i_agree_to_tenable_license_agreement=true' --output /home/packages/nessus.rpm; sleep 10; sudo dpkg -i /home/packages/nessus.deb; /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups=''$NessusGroup''; sudo /bin/systemctl start nessusagent.service; sudo /bin/systemctl status nessusagent.service; exit 100"
                         
            }         
           }
