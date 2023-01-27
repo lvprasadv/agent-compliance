@@ -8,9 +8,9 @@ data "google_project" "project" {
 }
 }*/
   
-############ os config tenable policy - ubuntu ##############
+############ os config tenable policy - centos/rhel ##############
 
-resource "google_os_config_os_policy_assignment" "oc-tenable-test" {
+resource "google_os_config_os_policy_assignment" "oc-tenable-centos" {
 
 
  # count = length(data.google_project.project[*].project_id)
@@ -18,13 +18,22 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-test" {
    project = "us-con-gcp-npr-dev100y-081021"
   
   location = "us-east1-b"
-  name = "oc-tenable-test"
-  description = "os policy assignment"
+  name = "oc-tenable-centos"
 
   instance_filter {
     all = false
+
+     exclusion_labels {
+      labels = {
+        nessus = "false"
+      }
+    }
+
     inventories {
-      os_short_name = "ubuntu"
+      os_short_name = "centos"
+    }
+    inventories {
+      os_short_name = "rhel"
     }
   }
 
@@ -85,12 +94,16 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-test" {
         exec {
           validate {
             interpreter = "SHELL"
-            script      = "if [[ $(service nessusagent status | grep 'active (running') ]]; then echo 'Nessus Agent is Installed State is running - Link Status Check Required'; exit 101; else exit 100; fi"
+            #script      = "if [[ $(service nessusagent status | grep 'active (running') ]]; then echo 'Nessus Agent is Installed State is running - Link Status Check Required'; exit 101; else exit 100; fi"
+            #script      = "if [[ $(service nessusagent status | grep 'active (running') ]]; then echo 'Nessus Agent is Installed State is running - Link Status Check Required'; if [[ $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'error') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'warn') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'Not linked') ]]; then echo 'Nessus Agent is not linked properly. Linking the agent'; fi; else exit 100; fi"  
+            script      = "if [[ $(service nessusagent status | grep 'active (running') ]]; then echo 'Nessus Agent is Installed State is running - Link Status Check Required'; if [[ $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'error') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'warn') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'Not linked') ]]; then echo 'Nessus Agent is not linked properly. Linking the agent'; exit 101; else exit 100; fi; else echo 'Nessus Agent is not running'; exit 100; fi"  
+          
           }
 
           enforce {
             interpreter = "SHELL"
-            script      = "if [[ $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'error') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'warn') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'Not linked') ]]; then echo 'Nessus Agent is not linked properly. Linking the agent'; nessuskey=a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16; NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google'); /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups=''$NessusGroup''; exit 101; else echo 'Nessus agent is already linked to host'; exit 100; fi"
+            #script      = "if [[ $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'error') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'warn') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'Not linked') ]]; then echo 'Nessus Agent is not linked properly. Linking the agent'; nessuskey=a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16; NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google'); /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups=''$NessusGroup''; exit 101; else echo 'Nessus agent is already linked to host'; exit 100; fi"
+            script      = " nessuskey=a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16; NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google'); /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups=''$NessusGroup''; exit 101; else echo 'Nessus agent is already linked to host'; exit 100; fi" 
             }         
           }
        }
@@ -105,9 +118,9 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-test" {
 
           enforce {
             interpreter = "SHELL"
-            script      = "nessuskey=a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16; NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google'); dpkg -r NessusAgent; echo 'download package and installing'; sudo apt-get install jq -y; curl -s -L 'https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/17306/download?i_agree_to_tenable_license_agreement=true' --output /home/packages/nessus.deb; sleep 10;  sudo dpkg -i /home/packages/nessus.deb; /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups=''$NessusGroup''; sudo /bin/systemctl start nessusagent.service; sudo /bin/systemctl status nessusagent.service; exit 100"
+            script      = "nessuskey=a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16; NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google'); sudo dpkg -r NessusAgent; echo 'downlaod package and installing'; sudo apt-get install jq -y; #AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains('es7.x86_64.rpm')) ] | max_by(.created_at) | .id'); curl -s -L 'https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/17306/download?i_agree_to_tenable_license_agreement=true' --output /home/packages/nessus.rpm; sleep 10; sudo dpkg -i /home/packages/nessus.deb; /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups=''$NessusGroup''; sudo /bin/systemctl start nessusagent.service; sudo /bin/systemctl status nessusagent.service; exit 100"
                         
-            }         
+           }         
           }
        }
      
