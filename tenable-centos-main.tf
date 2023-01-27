@@ -19,10 +19,16 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-test" {
   
   location = "us-east1-b"
   name = "oc-tenable-test"
-  description = "os policy assignment"
 
   instance_filter {
     all = false
+
+     exclusion_labels {
+      labels = {
+        nessus = "false"
+      }
+    }
+
     inventories {
       os_short_name = "centos"
     }
@@ -88,12 +94,16 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-test" {
         exec {
           validate {
             interpreter = "SHELL"
-            script      = "if [[ $(service nessusagent status | grep 'active (running') ]]; then echo 'Nessus Agent is Installed State is running - Link Status Check Required'; exit 101; else exit 100; fi"
+            #script      = "if [[ $(service nessusagent status | grep 'active (running') ]]; then echo 'Nessus Agent is Installed State is running - Link Status Check Required'; exit 101; else exit 100; fi"
+            #script      = "if [[ $(service nessusagent status | grep 'active (running') ]]; then echo 'Nessus Agent is Installed State is running - Link Status Check Required'; if [[ $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'error') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'warn') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'Not linked') ]]; then echo 'Nessus Agent is not linked properly. Linking the agent'; fi; else exit 100; fi"  
+            script      = "if [[ $(service nessusagent status | grep 'active (running') ]]; then echo 'Nessus Agent is Installed State is running - Link Status Check Required'; if [[ $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'error') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'warn') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'Not linked') ]]; then echo 'Nessus Agent is not linked properly. Linking the agent'; exit 101; else exit 100; fi; else echo 'Nessus Agent is not running'; exit 100; fi"  
+          
           }
 
           enforce {
             interpreter = "SHELL"
-            script      = "if [[ $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'error') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'warn') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'Not linked') ]]; then echo 'Nessus Agent is not linked properly. Linking the agent'; nessuskey=a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16; NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google'); /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups=''$NessusGroup''; exit 101; else echo 'Nessus agent is already linked to host'; exit 100; fi"
+            #script      = "if [[ $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'error') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'warn') || $(/opt/nessus_agent/sbin/nessuscli agent status | grep 'Not linked') ]]; then echo 'Nessus Agent is not linked properly. Linking the agent'; nessuskey=a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16; NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google'); /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups=''$NessusGroup''; exit 101; else echo 'Nessus agent is already linked to host'; exit 100; fi"
+            script      = " nessuskey=a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16; NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google'); /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups=''$NessusGroup''; exit 101; else echo 'Nessus agent is already linked to host'; exit 100; fi" 
             }         
           }
        }
@@ -108,9 +118,9 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-test" {
 
           enforce {
             interpreter = "SHELL"
-            script      = "nessuskey=a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16; NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google'); sudo rpm -e NessusAgent; echo 'downlaod package and installing'; sudo yum install epel-release -y; sudo yum install jq -y; curl -s -L 'https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/18068/download?i_agree_to_tenable_license_agreement=true' --output /home/packages/nessus.rpm; sleep 10; sudo rpm -ivh /home/packages/nessus.rpm; /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups=''$NessusGroup''; sudo /bin/systemctl start nessusagent.service; sudo /bin/systemctl status nessusagent.service; exit 100"
+            script      = "nessuskey=a521b5ff16a5d5272109d675bba8d84bd07e7126d686c1966ec8e1fce13abd16; NessusGroup=gcp-oc-$(curl 'http://metadata.google.internal/computeMetadata/v1/project/attributes/cshortname' -H 'Metadata-Flavor: Google'); sudo rpm -e NessusAgent; echo 'downlaod package and installing'; sudo yum install epel-release -y; sudo yum install jq -y; #AGENTPACKAGEID=$(curl -s -L https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents | jq '[.downloads[] | select(.name | contains('es7.x86_64.rpm')) ] | max_by(.created_at) | .id'); curl -s -L 'https://www.tenable.com/downloads/api/v1/public/pages/nessus-agents/downloads/18068/download?i_agree_to_tenable_license_agreement=true' --output /home/packages/nessus.rpm; sleep 10; sudo rpm -ivh /home/packages/nessus.rpm; /opt/nessus_agent/sbin/nessuscli agent link --host=cloud.tenable.com --port=443 --key=$nessuskey --groups=''$NessusGroup''; sudo /bin/systemctl start nessusagent.service; sudo /bin/systemctl status nessusagent.service; exit 100"
                         
-            }         
+           }         
           }
        }
      
@@ -124,7 +134,3 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-test" {
     min_wait_duration = "10s"
    }
 }
-
-#pass nessuskey
-#pass packageid
-#excludelabels
