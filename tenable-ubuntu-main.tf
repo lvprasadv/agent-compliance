@@ -10,7 +10,7 @@ data "google_project" "project" {
   
 ############ os config tenable policy - centos/rhel ##############
 
-resource "google_os_config_os_policy_assignment" "oc-tenable-centos" {
+resource "google_os_config_os_policy_assignment" "oc-tenable-ubuntu" {
 
 
  # count = length(data.google_project.project[*].project_id)
@@ -18,7 +18,7 @@ resource "google_os_config_os_policy_assignment" "oc-tenable-centos" {
    project = "us-con-gcp-npr-dev100y-081021"
   
   location = "us-east1-b"
-  name = "oc-tenable-centos"
+  name = "oc-tenable-ubuntu"
 
   instance_filter {
     all = false
